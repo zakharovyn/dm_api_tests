@@ -1,11 +1,29 @@
 from services.dm_api_account import DmApiAccount
+from services.mailhog import MailhogApi
+import structlog
+
+
+structlog.configure(
+    processors=[
+        structlog.processors.JSONRenderer(indent=4, sort_keys=True, ensure_ascii=False)
+    ]
+)
 
 
 def test_put_v1_account_token():
+
+    mailhog = MailhogApi(host='http://5.63.153.31:5025')
     api = DmApiAccount(host='http://5.63.153.31:5051')
 
-    token = '444ed273-0574-41c5-a385-c8bd60af4ec1' # нужен метод для получения токена
+    json = {
+        "login": "new_user6",
+        "email": "new_user6@email.com",
+        "password": "new_user6"
+    }
 
-    response = api.account.put_v1_account_token(
-        token=token
-    )
+    response = api.account.post_v1_account(json=json)
+    assert response.status_code == 201, f'Статус код ответа должен быть равено 201, но он равен {response.status_code}'
+
+    token = mailhog.get_token_from_last_email()
+    response = api.account.put_v1_account_token(token=token)
+    assert response.status_code == 200, f'Статус код ответа должен быть равено 200, но он равен {response.status_code}'
