@@ -1,4 +1,5 @@
-from dm_api_account.models.post_account_login_model import post_account_login_model
+from dm_api_account.models.request_post_v1_account_login_model import LoginCredentialsModel
+from dm_api_account.models.user_envelope_model import UserEnvelopeModel
 from restclient.restclient import Restclient
 from requests import Response
 
@@ -12,7 +13,7 @@ class LoginApi:
             self.client.session.headers.update(headers)
         # self.client.session.headers.update(headers) if headers else None
 
-    def post_v1_account_login(self, json: post_account_login_model, **kwargs) -> Response:
+    def post_v1_account_login(self, json: LoginCredentialsModel, **kwargs) -> Response:
         """
         Authenticate via credentials
         :return:
@@ -20,9 +21,10 @@ class LoginApi:
 
         response = self.client.post(
             path=f"/v1/account/login",
-            json=json,
+            json=json.model_dump(by_alias=True, exclude_none=True),
             **kwargs
         )
+        UserEnvelopeModel(**response.json())
 
         return response
 

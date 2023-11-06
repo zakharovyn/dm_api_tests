@@ -1,3 +1,4 @@
+from dm_api_account.models.request_post_v1_account_model import RegistrationModel
 from services.dm_api_account import DmApiAccount
 from services.mailhog import MailhogApi
 import structlog
@@ -15,11 +16,11 @@ def test_put_v1_account_token():
     mailhog = MailhogApi(host='http://5.63.153.31:5025')
     api = DmApiAccount(host='http://5.63.153.31:5051')
 
-    json = {
-        "login": "new_user6",
-        "email": "new_user6@email.com",
-        "password": "new_user6"
-    }
+    json = RegistrationModel(
+        login="new_user27",
+        email="new_user27@email.com",
+        password="new_user27"
+    )
 
     response = api.account.post_v1_account(json=json)
     assert response.status_code == 201, f'Статус код ответа должен быть равено 201, но он равен {response.status_code}'
