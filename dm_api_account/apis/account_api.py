@@ -1,9 +1,9 @@
-from dm_api_account.models.request_put_v1_account_password_model import ChangePasswordModel
-from dm_api_account.models.request_post_v1_account_password_model import ResetPasswordModel
 from dm_api_account.models.user_details_envelope_model import UserDetailsEnvelopeModel
+from dm_api_account.models.change_password_model import ChangePasswordModel
+from dm_api_account.models.reset_password_model import ResetPasswordModel
 from dm_api_account.models.user_envelope_model import UserEnvelopeModel
-from dm_api_account.models.request_put_v1_account_email_model import ChangeEmailModel
-from dm_api_account.models.request_post_v1_account_model import RegistrationModel
+from dm_api_account.models.change_email_model import ChangeEmailModel
+from dm_api_account.models.registration_model import RegistrationModel
 from restclient.restclient import Restclient
 from requests import Response
 
@@ -84,7 +84,7 @@ class AccountApi:
         """
         response = self.client.put(
             path=f"/v1/account/password",
-            json=json,
+            json=json.model_dump(by_alias=True, exclude_none=True),
             **kwargs
         )
         UserEnvelopeModel(**response.json())

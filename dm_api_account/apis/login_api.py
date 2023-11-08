@@ -1,4 +1,4 @@
-from dm_api_account.models.request_post_v1_account_login_model import LoginCredentialsModel
+from dm_api_account.models.login_credentials_model import LoginCredentialsModel
 from dm_api_account.models.user_envelope_model import UserEnvelopeModel
 from restclient.restclient import Restclient
 from requests import Response

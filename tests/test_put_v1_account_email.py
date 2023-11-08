@@ -1,5 +1,5 @@
-from dm_api_account.models.request_post_v1_account_model import RegistrationModel
-from dm_api_account.models.request_put_v1_account_email_model import ChangeEmailModel
+from dm_api_account.models.registration_model import RegistrationModel
+from dm_api_account.models.change_email_model import ChangeEmailModel
 from services.dm_api_account import DmApiAccount
 from services.mailhog import MailhogApi
 import structlog
