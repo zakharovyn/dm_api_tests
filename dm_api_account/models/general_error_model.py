@@ -3,9 +3,8 @@ from pydantic import BaseModel, Field, StrictStr, ConfigDict
 from typing import Optional
 
 
-class ResetPassword(BaseModel):
+class GeneralError(BaseModel):
 
     model_config = ConfigDict(extra='forbid')
 
-    login: Optional[StrictStr] = Field(None, description='Login')
-    email: Optional[StrictStr] = Field(None, description='Email')
+    message: Optional[StrictStr] = Field(None, description='Client message')

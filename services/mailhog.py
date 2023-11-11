@@ -25,13 +25,18 @@ class MailhogApi:
 
         return response
 
-    def get_token_from_last_email(self) -> str:
+    def get_token_from_last_email(self, reset_password: bool = False) -> str:
         """
         Get user activation token from last email
         :return:
         """
         time.sleep(2)
         email = self.get_api_v2_messages(limit=1).json()
-        token_url = json.loads(email['items'][0]['Content']['Body'])['ConfirmationLinkUrl']
+        if reset_password is False:
+            token_url = json.loads(email['items'][0]['Content']['Body'])['ConfirmationLinkUrl']
+        else:
+            token_url = json.loads(email['items'][0]['Content']['Body'])['ConfirmationLinkUri']
+
         token = token_url.split('/')[-1]
+
         return token
