@@ -1,6 +1,8 @@
-from dm_api_account.models.login_credentials_model import LoginCredentialsModel
-from dm_api_account.models.registration_model import RegistrationModel
+from dm_api_account.models.login_credentials_model import LoginCredentials
+from dm_api_account.models.user_envelope_model import UserRole, Rating
+from dm_api_account.models.registration_model import Registration
 from services.dm_api_account import DmApiAccount
+from hamcrest import assert_that, has_properties
 from services.mailhog import MailhogApi
 import structlog
 
@@ -14,25 +16,30 @@ structlog.configure(
 
 def test_post_v1_account_login():
 
+    num = '57'
+
     mailhog = MailhogApi(host='http://5.63.153.31:5025')
     api = DmApiAccount(host='http://5.63.153.31:5051')
 
-    json = RegistrationModel(
-        login="new_user25",
-        email="new_user25@email.com",
-        password="new_user25"
+    json = Registration(
+        login=f"new_user{num}",
+        email=f"new_user{num}@email.com",
+        password=f"new_user{num}"
     )
-    response = api.account.post_v1_account(json=json)
-    assert response.status_code == 201, f'Статус код ответа должен быть равено 201, но он равен {response.status_code}'
+    api.account.post_v1_account(json=json)
 
     token = mailhog.get_token_from_last_email()
-    response = api.account.put_v1_account_token(token=token)
-    assert response.status_code == 200, f'Статус код ответа должен быть равено 200, но он равен {response.status_code}'
+    api.account.put_v1_account_token(token=token)
 
-    json = LoginCredentialsModel(
-        login="new_user25",
-        password="new_user25",
+    json = LoginCredentials(
+        login=f"new_user{num}",
+        password=f"new_user{num}",
         rememberMe=True
     )
     response = api.login.post_v1_account_login(json=json)
-    assert response.status_code == 200, f'Статус код ответа должен быть равено 200, но он равен {response.status_code}'
+
+    assert_that(response.resource, has_properties({
+        "login": f"new_user{num}",
+        "roles": [UserRole.guest, UserRole.player],
+        "rating": Rating(enabled=True, quality=0, quantity=0)
+    }))

@@ -3,3 +3,5 @@ pytest==7.4.3
 structlog==23.2.0
 curlify==2.2.1
 pydantic==2.4.2
+'datamodel-code-generator[http]'==0.22.1
+pyhamcrest==2.1.0
