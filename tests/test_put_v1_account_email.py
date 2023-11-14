@@ -1,9 +1,6 @@
 from dm_api_account.models.user_envelope_model import UserRole, Rating
-from dm_api_account.models.registration_model import Registration
-from dm_api_account.models.change_email_model import ChangeEmail
-from services.dm_api_account import DmApiAccount
 from hamcrest import assert_that, has_properties
-from services.mailhog import MailhogApi
+from services.dm_api_account import Facade
 import structlog
 
 
@@ -15,31 +12,38 @@ structlog.configure(
 
 
 def test_put_v1_account_email():
+    api = Facade(host='http://5.63.153.31:5051')
 
-    num = '55'
+    num = '91'
 
-    mailhog = MailhogApi(host='http://5.63.153.31:5025')
-    api = DmApiAccount(host='http://5.63.153.31:5051')
+    login = f"new_user{num}"
+    email = f"new_user{num}@email.com"
+    password = f"new_user{num}"
 
-    json = Registration(
-        login=f"new_user{num}",
-        email=f"new_user{num}@email.com",
-        password=f"new_user{num}"
+    api.account.register_new_user(
+        login=login,
+        email=email,
+        password=password
     )
-    api.account.post_v1_account(json=json)
 
-    token = mailhog.get_token_from_last_email()
-    api.account.put_v1_account_token(token=token)
+    api.account.activate_registered_user(login=login)
 
-    json = ChangeEmail(
-        login=f"new_user{num}",
-        password=f"new_user{num}",
-        email=f"new_new_user{num}@email.com"
+    token = api.login.get_auth_token(
+        login=login,
+        password=password
     )
-    response = api.account.put_v1_account_email(json=json)
+
+    api.account.set_headers(headers=token)
+
+    new_email = f"very_new_user{num}@email.com"
+    response = api.account.change_registered_user_email(
+        login=login,
+        password=password,
+        email=new_email
+    )
 
     assert_that(response.resource, has_properties({
-        "login": f"new_user{num}",
+        "login": login,
         "roles": [UserRole.guest, UserRole.player],
         "rating": Rating(enabled=True, quality=0, quantity=0)
     }))

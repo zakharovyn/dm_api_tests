@@ -1,8 +1,6 @@
-from dm_api_account.models import Registration, ChangePassword, ResetPassword
 from dm_api_account.models.user_envelope_model import UserRole, Rating
-from services.dm_api_account import DmApiAccount
 from hamcrest import assert_that, has_properties
-from services.mailhog import MailhogApi
+from services.dm_api_account import Facade
 import structlog
 
 
@@ -15,42 +13,48 @@ structlog.configure(
 
 def test_put_v1_account_password():
 
-    num = '54'
+    api = Facade(host='http://5.63.153.31:5051')
 
-    mailhog = MailhogApi(host='http://5.63.153.31:5025')
-    api = DmApiAccount(host='http://5.63.153.31:5051')
+    num = '85'
 
-    json = Registration(
-        login=f"new_user{num}",
-        email=f"new_user{num}@email.com",
-        password=f"new_user{num}"
-    )
-    api.account.post_v1_account(json=json)
+    login = f"new_user{num}"
+    email = f"new_user{num}@email.com"
+    password = f"new_user{num}"
 
-    token = mailhog.get_token_from_last_email()
-    api.account.put_v1_account_token(token=token)
-
-    reset_password_json = ResetPassword(
-        login=f"new_user{num}",
-        email=f"new_user{num}@email.com"
-    )
-    api.account.post_v1_account_password(json=reset_password_json, status_code=200)
-    token = mailhog.get_token_from_last_email(reset_password=True)
-
-    change_password_json = ChangePassword(
-        login=f"new_user{num}",
-        token=token,
-        oldPassword=f"new_user{num}",
-        newPassword="new_user47"
+    api.account.register_new_user(
+        login=login,
+        email=email,
+        password=password
     )
 
-    response = api.account.put_v1_account_password(json=change_password_json)
+    api.account.activate_registered_user(login=login)
+
+    token = api.login.get_auth_token(
+        login=login,
+        password=password
+    )
+    api.account.set_headers(headers=token)
+
+    api.account.reset_registered_user_password(
+        login=login,
+        email=email
+    )
+
+    new_token = api.mailhog.get_token_by_login(
+        login=login,
+        reset_password=True
+    )
+
+    new_password = f"very_new_user{num}"
+    response = api.account.change_registered_user_password(
+        login=login,
+        token=new_token,
+        old_password=password,
+        new_password=new_password
+    )
 
     assert_that(response.resource, has_properties({
-        "login": f"new_user{num}",
+        "login": login,
         "roles": [UserRole.guest, UserRole.player],
         "rating": Rating(enabled=True, quality=0, quantity=0)
     }))
-
-
-

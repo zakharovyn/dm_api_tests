@@ -1,8 +1,6 @@
 from dm_api_account.models.user_envelope_model import UserRole, Rating
-from dm_api_account.models.registration_model import Registration
-from services.dm_api_account import DmApiAccount
 from hamcrest import assert_that, has_properties
-from services.mailhog import MailhogApi
+from services.dm_api_account import Facade
 import structlog
 
 
@@ -15,24 +13,24 @@ structlog.configure(
 
 def test_put_v1_account_token():
 
-    num = '53'
+    api = Facade(host='http://5.63.153.31:5051')
 
-    mailhog = MailhogApi(host='http://5.63.153.31:5025')
-    api = DmApiAccount(host='http://5.63.153.31:5051')
+    num = '93'
 
-    json = Registration(
-        login=f"new_user{num}",
-        email=f"new_user{num}@email.com",
-        password=f"new_user{num}"
+    login = f"new_user{num}"
+    email = f"new_user{num}@email.com"
+    password = f"new_user{num}"
+
+    api.account.register_new_user(
+        login=login,
+        email=email,
+        password=password
     )
 
-    api.account.post_v1_account(json=json)
-
-    token = mailhog.get_token_from_last_email()
-    response = api.account.put_v1_account_token(token=token)
+    response = api.account.activate_registered_user(login=login)
 
     assert_that(response.resource, has_properties({
-        "login": f"new_user{num}",
+        "login": login,
         "roles": [UserRole.guest, UserRole.player],
         "rating": Rating(enabled=True, quality=0, quantity=0)
     }))

@@ -1,5 +1,4 @@
-from services.dm_api_account import DmApiAccount
-from services.mailhog import MailhogApi
+from services.dm_api_account import Facade
 import structlog
 
 
@@ -12,7 +11,23 @@ structlog.configure(
 
 def test_get_v1_account():
 
-    mailhog = MailhogApi(host='http://5.63.153.31:5025')
-    api = DmApiAccount(host='http://5.63.153.31:5051')
+    api = Facade(host='http://5.63.153.31:5051')
 
-    response = api.account.get_v1_account()
+    num = '65'
+
+    login = f"new_user{num}"
+    email = f"new_user{num}@email.com"
+    password = f"new_user{num}"
+
+    api.account.register_new_user(
+        login=login,
+        email=email,
+        password=password
+    )
+
+    api.account.activate_registered_user(login=login)
+
+    token = api.login.get_auth_token(login=login, password=password)
+    api.account.set_headers(headers=token)
+
+    api.account.get_current_user_info()

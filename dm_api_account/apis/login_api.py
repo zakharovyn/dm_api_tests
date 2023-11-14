@@ -18,7 +18,7 @@ class LoginApi:
             json: LoginCredentials,
             status_code: int = 200,
             **kwargs
-    ) -> Response | UserEnvelope:
+    ) -> Response:
         """
         Authenticate via credentials
         :return:
@@ -32,7 +32,7 @@ class LoginApi:
         validate_status_code(response, status_code)
 
         if response.status_code == 200:
-            return UserEnvelope(**response.json())
+            UserEnvelope(**response.json())
 
         return response
 
