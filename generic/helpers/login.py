@@ -10,14 +10,15 @@ class Login:
     def set_headers(self, headers):
         self.facade.login_api.client.session.headers.update(headers)
 
-    def login_user(self, login: str, password: str, remember_me: bool = True):
+    def login_user(self, login: str, password: str, remember_me: bool = True, need_json: bool = True):
 
         response = self.facade.login_api.post_v1_account_login(
             json=LoginCredentials(
                 login=login,
                 password=password,
                 rememberMe=remember_me
-            )
+            ),
+            need_json=need_json
         )
         return response
 

@@ -53,12 +53,15 @@ class Account:
     def change_registered_user_password(
             self,
             login: str,
-            token: str,
             old_password: str,
             new_password: str,
             status_code: int = 200,
             **kwargs
     ):
+        token = self.facade.mailhog.get_token_by_login(
+            login=login,
+            reset_password=True
+        )
         response = self.facade.account_api.put_v1_account_password(
             json=ChangePassword(
                 login=login,

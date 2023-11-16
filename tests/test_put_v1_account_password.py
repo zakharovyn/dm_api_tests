@@ -15,7 +15,7 @@ def test_put_v1_account_password():
 
     api = Facade(host='http://5.63.153.31:5051')
 
-    num = '85'
+    num = '97'
 
     login = f"new_user{num}"
     email = f"new_user{num}@email.com"
@@ -40,15 +40,9 @@ def test_put_v1_account_password():
         email=email
     )
 
-    new_token = api.mailhog.get_token_by_login(
-        login=login,
-        reset_password=True
-    )
-
     new_password = f"very_new_user{num}"
     response = api.account.change_registered_user_password(
         login=login,
-        token=new_token,
         old_password=password,
         new_password=new_password
     )

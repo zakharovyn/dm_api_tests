@@ -1,3 +1,6 @@
+from hamcrest import assert_that, has_properties
+
+from dm_api_account.models.user_envelope_model import UserRole, Rating
 from services.dm_api_account import Facade
 import structlog
 
@@ -13,7 +16,7 @@ def test_get_v1_account():
 
     api = Facade(host='http://5.63.153.31:5051')
 
-    num = '65'
+    num = '101'
 
     login = f"new_user{num}"
     email = f"new_user{num}@email.com"
@@ -30,4 +33,10 @@ def test_get_v1_account():
     token = api.login.get_auth_token(login=login, password=password)
     api.account.set_headers(headers=token)
 
-    api.account.get_current_user_info()
+    response = api.account.get_current_user_info()
+
+    assert_that(response.resource, has_properties({
+        "login": login,
+        "roles": [UserRole.guest, UserRole.player],
+        "rating": Rating(enabled=True, quality=0, quantity=0)
+    }))

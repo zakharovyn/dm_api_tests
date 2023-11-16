@@ -17,8 +17,9 @@ class LoginApi:
             self,
             json: LoginCredentials,
             status_code: int = 200,
+            need_json: bool = True,
             **kwargs
-    ) -> Response:
+    ) -> Response | UserEnvelope:
         """
         Authenticate via credentials
         :return:
@@ -34,7 +35,10 @@ class LoginApi:
         if response.status_code == 200:
             UserEnvelope(**response.json())
 
-        return response
+        if need_json is True:
+            return response
+        else:
+            return UserEnvelope(**response.json())
 
     def delete_v1_account_login(
             self,
