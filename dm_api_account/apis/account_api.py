@@ -14,8 +14,8 @@ class AccountApi:
         # self.client.session.headers.update(headers) if headers else None
 
     def post_v1_account(
-            self, json:
-            Registration,
+            self,
+            json: Registration,
             status_code: int = 201,
             **kwargs
     ) -> Response:

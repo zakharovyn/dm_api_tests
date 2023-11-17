@@ -1,6 +1,4 @@
-from dm_api_account.models import Registration, ResetPassword
-from services.dm_api_account import DmApiAccount
-from services.mailhog import MailhogApi
+from services.dm_api_account import Facade
 import structlog
 
 
@@ -13,26 +11,37 @@ structlog.configure(
 
 def test_post_v1_account_password():
 
-    num = '56'
+    api = Facade(host='http://5.63.153.31:5051')
 
-    mailhog = MailhogApi(host='http://5.63.153.31:5025')
-    api = DmApiAccount(host='http://5.63.153.31:5051')
+    num = '90'
 
-    json = Registration(
-        login=f"new_user{num}",
-        email=f"new_user{num}@email.com",
-        password=f"new_user{num}"
+    login = f"new_user{num}"
+    email = f"new_user{num}@email.com"
+    password = f"new_user{num}"
+
+    api.account.register_new_user(
+        login=login,
+        email=email,
+        password=password
     )
-    api.account.post_v1_account(json=json)
 
-    token = mailhog.get_token_from_last_email()
-    api.account.put_v1_account_token(token=token)
+    api.account.activate_registered_user(login=login)
 
-    reset_password_json = ResetPassword(
-        login=f"new_user{num}",
-        email=f"new_user{num}@email.com"
+    token = api.login.get_auth_token(
+        login=login,
+        password=password
     )
-    api.account.post_v1_account_password(json=reset_password_json, status_code=200)
-    reset_token = mailhog.get_token_from_last_email(reset_password=True)
 
-    assert token != reset_token
+    api.account.set_headers(headers=token)
+
+    api.account.reset_registered_user_password(
+        login=login,
+        email=email
+    )
+
+    new_token = api.mailhog.get_token_by_login(
+        login=login,
+        reset_password=True
+    )
+
+    assert token != new_token

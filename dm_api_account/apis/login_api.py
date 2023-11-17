@@ -17,6 +17,7 @@ class LoginApi:
             self,
             json: LoginCredentials,
             status_code: int = 200,
+            need_json: bool = True,
             **kwargs
     ) -> Response | UserEnvelope:
         """
@@ -32,9 +33,12 @@ class LoginApi:
         validate_status_code(response, status_code)
 
         if response.status_code == 200:
-            return UserEnvelope(**response.json())
+            UserEnvelope(**response.json())
 
-        return response
+        if need_json is True:
+            return response
+        else:
+            return UserEnvelope(**response.json())
 
     def delete_v1_account_login(
             self,
