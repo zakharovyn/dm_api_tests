@@ -7,3 +7,5 @@ pydantic==2.4.2
 pyhamcrest==2.1.0
 psycopg2-binary==2.9.9
 records==0.5.3
+sqlalchemy==2.0.23
+sqlacodegen==2.3.0post1
