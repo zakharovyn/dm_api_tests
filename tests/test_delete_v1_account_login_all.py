@@ -50,3 +50,5 @@ def test_delete_v1_account_login_all():
     api.login.set_headers(headers=token)
 
     api.login.logout_user_from_all_devices()
+
+    orm.db.close_connection()

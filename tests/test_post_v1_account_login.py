@@ -52,4 +52,5 @@ def test_post_v1_account_login():
         "roles": [UserRole.guest, UserRole.player],
         "rating": Rating(enabled=True, quality=0, quantity=0)
     }))
+
     orm.db.close_connection()

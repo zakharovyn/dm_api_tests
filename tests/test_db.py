@@ -27,8 +27,6 @@ def test_orm():
         print(row.Login)
         print(row.Email)
 
-
-
     print(dataset)
     orm.db.close_connection()
 

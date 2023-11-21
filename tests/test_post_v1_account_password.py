@@ -61,3 +61,5 @@ def test_post_v1_account_password():
     )
 
     assert token != new_token
+
+    orm.db.close_connection()
