@@ -1,6 +1,5 @@
-from hamcrest import assert_that, has_properties
-
 from dm_api_account.models.user_envelope_model import UserRole, Rating
+from hamcrest import assert_that, has_properties
 from services.dm_api_account import Facade
 import structlog
 
