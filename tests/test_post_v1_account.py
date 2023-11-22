@@ -1,8 +1,5 @@
-import time
-
 from dm_api_account.models.user_envelope_model import UserRole, Rating
 from hamcrest import assert_that, has_properties
-
 from generic.helpers.dm_db import DmDatabase
 from services.dm_api_account import Facade
 import structlog
