@@ -1,34 +1,18 @@
 from dm_api_account.models.user_envelope_model import UserRole, Rating
 from hamcrest import assert_that, has_properties
-from generic.helpers.orm_db import OrmDatabase
-from services.dm_api_account import Facade
-import structlog
 
 
-structlog.configure(
-    processors=[
-        structlog.processors.JSONRenderer(indent=4, sort_keys=True, ensure_ascii=False)
-    ]
-)
-
-
-def test_put_v1_account_password():
-
-    orm = OrmDatabase(user='postgres', password='admin', host='5.63.153.31', database='dm3.5')
-    api = Facade(host='http://5.63.153.31:5051')
-
-    num = '97'
-
-    login = f"new_user{num}"
-    email = f"new_user{num}@email.com"
-    password = f"new_user{num}"
+def test_put_v1_account_password(facade, orm, prepare_user):
+    login = prepare_user.login
+    email = prepare_user.email
+    password = prepare_user.password
 
     orm.delete_user_by_login(login=login)
 
     dataset = orm.get_user_by_login(login=login)
     assert len(dataset) == 0
 
-    api.account.register_new_user(
+    facade.account.register_new_user(
         login=login,
         email=email,
         password=password
@@ -45,19 +29,19 @@ def test_put_v1_account_password():
     for row in dataset:
         assert row.Activated is True
 
-    token = api.login.get_auth_token(
+    token = facade.login.get_auth_token(
         login=login,
         password=password
     )
-    api.account.set_headers(headers=token)
+    facade.account.set_headers(headers=token)
 
-    api.account.reset_registered_user_password(
+    facade.account.reset_registered_user_password(
         login=login,
         email=email
     )
 
-    new_password = f"very_new_user{num}"
-    response = api.account.change_registered_user_password(
+    new_password = f"very_new_user107"
+    response = facade.account.change_registered_user_password(
         login=login,
         old_password=password,
         new_password=new_password
@@ -68,5 +52,3 @@ def test_put_v1_account_password():
         "roles": [UserRole.guest, UserRole.player],
         "rating": Rating(enabled=True, quality=0, quantity=0)
     }))
-
-    orm.db.close_connection()

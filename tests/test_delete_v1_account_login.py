@@ -1,32 +1,16 @@
-from generic.helpers.orm_db import OrmDatabase
-from services.dm_api_account import Facade
-import structlog
 
 
-structlog.configure(
-    processors=[
-        structlog.processors.JSONRenderer(indent=4, sort_keys=True, ensure_ascii=False)
-    ]
-)
-
-
-def test_delete_v1_account_login():
-
-    orm = OrmDatabase(user='postgres', password='admin', host='5.63.153.31', database='dm3.5')
-    api = Facade(host='http://5.63.153.31:5051')
-
-    num = '87'
-
-    login = f"new_user{num}"
-    email = f"new_user{num}@email.com"
-    password = f"new_user{num}"
+def test_delete_v1_account_login(facade, orm, prepare_user):
+    login = prepare_user.login
+    email = prepare_user.email
+    password = prepare_user.password
 
     orm.delete_user_by_login(login=login)
 
     dataset = orm.get_user_by_login(login=login)
     assert len(dataset) == 0
 
-    api.account.register_new_user(
+    facade.account.register_new_user(
         login=login,
         email=email,
         password=password
@@ -43,12 +27,10 @@ def test_delete_v1_account_login():
     for row in dataset:
         assert row.Activated is True
 
-    token = api.login.get_auth_token(
+    token = facade.login.get_auth_token(
         login=login,
         password=password
     )
-    api.login.set_headers(headers=token)
+    facade.login.set_headers(headers=token)
 
-    api.login.logout_user()
-
-    orm.db.close_connection()
+    facade.login.logout_user()

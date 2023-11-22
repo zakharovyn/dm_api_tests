@@ -19,8 +19,8 @@ def test_orm():
     orm = OrmDatabase(user=user, password=password, host=host, database=database)
     # dataset = orm.get_all_users()
 
-    dataset = orm.update_activation_status(login='new_user106', activation_status=False)
-    dataset = orm.get_user_by_login(login='new_user106')
+    dataset = orm.update_activation_status(login='new_user105', activation_status=False)
+    dataset = orm.get_user_by_login(login='new_user105')
     row: User
     for row in dataset:
         print(row.Activated)
