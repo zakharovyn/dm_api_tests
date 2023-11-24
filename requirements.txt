@@ -9,3 +9,4 @@ psycopg2-binary==2.9.9
 records==0.5.3
 sqlalchemy==2.0.23
 sqlacodegen==2.3.0post1
+vyper-config==1.2.1
