@@ -1,35 +1,13 @@
 from dm_api_account.models.user_envelope_model import UserRole, Rating
-from hamcrest import assert_that, has_properties
-from generic.helpers.dm_db import DmDatabase
-from services.dm_api_account import Facade
-import structlog
+from hamcrest import assert_that, has_properties, has_entries
 
 
-structlog.configure(
-    processors=[
-        structlog.processors.JSONRenderer(indent=4, sort_keys=True, ensure_ascii=False)
-    ]
-)
+def test_post_v1_account(facade, db, prepare_user):
+    login = prepare_user.login
+    email = prepare_user.email
+    password = prepare_user.password
 
-
-def test_post_v1_account():
-
-    api = Facade(host='http://5.63.153.31:5051')
-    db = DmDatabase(user='postgres', password='admin', host='5.63.153.31', database='dm3.5')
-
-    num = '106'
-
-    login = f"new_user{num}"
-    email = f"new_user{num}@email.com"
-    password = f"new_user{num}"
-
-    db.delete_user_by_login(login=login)
-    dataset = db.get_user_by_login(login=login)
-    assert len(dataset) == 0
-
-    api.mailhog.delete_all_messages()
-
-    api.account.register_new_user(
+    facade.account.register_new_user(
         login=login,
         email=email,
         password=password
@@ -37,16 +15,24 @@ def test_post_v1_account():
 
     dataset = db.get_user_by_login(login=login)
     for row in dataset:
-        assert row['Login'] == login, f'User {login} not registered'
-        assert row['Activated'] is False, f'User {login} was activated'
+        assert_that(row, has_entries(
+            {
+                'Login': login,
+                'Activated': False
+            }
+        ))
 
-    db.update_activation_status(login='new_user106', activation_status='true')
+    db.update_activation_status(login='new_user105', activation_status='true')
 
     dataset = db.get_user_by_login(login=login)
     for row in dataset:
-        assert row['Activated'] is True, f'User {login} not activated'
+        assert_that(row, has_entries(
+            {
+                'Activated': True
+            }
+        ))
 
-    response = api.login.login_user(
+    response = facade.login.login_user(
         login=login,
         password=password,
         need_json=False

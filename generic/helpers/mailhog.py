@@ -25,7 +25,7 @@ class MailhogApi:
 
     def __init__(self, host='http://5.63.153.31:5025'):
         self.host = host
-        self.client = self.client = Restclient(host=host)
+        self.client = Restclient(host=host)
 
     def get_api_v2_messages(self, limit: int = 50) -> Response:
         """
