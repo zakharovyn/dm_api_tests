@@ -1,3 +1,5 @@
+import allure
+
 from restclient.restclient import Restclient
 from requests import Response
 import json
@@ -33,12 +35,13 @@ class MailhogApi:
         :param limit:
         :return:
         """
-        response = self.client.get(
-            path=f"/api/v2/messages",
-            params={
-                'limit': limit
-            }
-        )
+        with allure.step('Получение последних поступивших писем'):
+            response = self.client.get(
+                path=f"/api/v2/messages",
+                params={
+                    'limit': limit
+                }
+            )
 
         return response
 
@@ -47,14 +50,15 @@ class MailhogApi:
         Get user activation token from last email
         :return:
         """
-        time.sleep(2)
-        email = self.get_api_v2_messages(limit=1).json()
-        if reset_password is False:
-            token_url = json.loads(email['items'][0]['Content']['Body'])['ConfirmationLinkUrl']
-        else:
-            token_url = json.loads(email['items'][0]['Content']['Body'])['ConfirmationLinkUri']
+        with allure.step('Получение токена из последнего поступившего письма'):
+            time.sleep(2)
+            email = self.get_api_v2_messages(limit=1).json()
+            if reset_password is False:
+                token_url = json.loads(email['items'][0]['Content']['Body'])['ConfirmationLinkUrl']
+            else:
+                token_url = json.loads(email['items'][0]['Content']['Body'])['ConfirmationLinkUri']
 
-        token = token_url.split('/')[-1]
+            token = token_url.split('/')[-1]
 
         return token
 
@@ -66,23 +70,25 @@ class MailhogApi:
         :param login: login
         :return: token
         """
-        if attempt == 0:
-            raise AssertionError(f'Не удалось получить письмо с логином {login}')
+        with allure.step('Получение токена по логину пользователя'):
+            if attempt == 0:
+                raise AssertionError(f'Не удалось получить письмо с логином {login}')
 
-        emails = self.get_api_v2_messages(limit=100).json()['items']
+            emails = self.get_api_v2_messages(limit=100).json()['items']
 
-        for email in emails:
-            user_data = json.loads(email['Content']['Body'])
-            if login == user_data.get('Login') and reset_password is False:
-                token = user_data['ConfirmationLinkUrl'].split('/')[-1]
-                return token
-            elif login == user_data.get('Login') and reset_password is True:
-                token = user_data['ConfirmationLinkUri'].split('/')[-1]
-                return token
+            for email in emails:
+                user_data = json.loads(email['Content']['Body'])
+                if login == user_data.get('Login') and reset_password is False:
+                    token = user_data['ConfirmationLinkUrl'].split('/')[-1]
+                    return token
+                elif login == user_data.get('Login') and reset_password is True:
+                    token = user_data['ConfirmationLinkUri'].split('/')[-1]
+                    return token
 
-        time.sleep(2)
+            time.sleep(2)
         return self.get_token_by_login(login=login, attempt=attempt - 1)
 
     def delete_all_messages(self):
-        response = self.client.delete(path='/api/v1/messages')
+        with allure.step('Удаление всех писем'):
+            response = self.client.delete(path='/api/v1/messages')
         return response

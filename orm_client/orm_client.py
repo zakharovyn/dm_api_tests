@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 import structlog
+import allure
 import uuid
 
 
@@ -21,10 +22,20 @@ class OrmClient:
             event='request',
             query=str(query)
         )
+        allure.attach(
+            f'Запрос: {query.compile(compile_kwargs={"literal_binds": True})}',
+            name='request in DB',
+            attachment_type=allure.attachment_type.TEXT
+        )
         dataset = self.db.execute(statement=query).mappings().all()
         log.msg(
             event='response',
             dataset=[dict(row) for row in dataset]
+        )
+        allure.attach(
+            str(dataset),
+            name='response DB',
+            attachment_type=allure.attachment_type.TEXT
         )
         return dataset
 
@@ -34,6 +45,11 @@ class OrmClient:
         log.msg(
             event='request',
             query=str(query)
+        )
+        allure.attach(
+            f'Запрос: {query.compile(compile_kwargs={"literal_binds": True})}',
+            name='request in DB',
+            attachment_type=allure.attachment_type.TEXT
         )
         self.db.execute(statement=query)
 

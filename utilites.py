@@ -1,4 +1,6 @@
 from string import ascii_letters, digits
+
+import allure
 from pydantic import BaseModel
 from requests import Response
 import random
@@ -11,8 +13,9 @@ def validate_request_json(json: str | BaseModel):
 
 
 def validate_status_code(response: Response, status_code: int):
-    assert response.status_code == status_code, \
-        f'Статус код ответа должен быть равен {status_code}, но он равен {response.status_code}'
+    with allure.step('Проверка валидации и статус кода'):
+        assert response.status_code == status_code, \
+            f'Статус код ответа должен быть равен {status_code}, но он равен {response.status_code}'
 
 
 def random_string(begin: int = 1, end: int = 30):
