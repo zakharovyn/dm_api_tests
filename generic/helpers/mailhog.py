@@ -1,4 +1,4 @@
-from common_libs.restclient.restclient import Restclient
+from restclient.restclient import Restclient
 from requests import Response
 import allure
 import json

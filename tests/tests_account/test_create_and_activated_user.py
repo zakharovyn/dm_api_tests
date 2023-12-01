@@ -1,4 +1,4 @@
-from utilites import random_string
+from dm_api_account.utilites import random_string
 import pytest
 
 

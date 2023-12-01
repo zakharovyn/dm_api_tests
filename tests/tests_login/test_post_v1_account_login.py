@@ -1,4 +1,4 @@
-from apis.dm_api_account.models.user_envelope_model import Rating, UserRole
+from dm_api_account.models.user_envelope_model import Rating, UserRole
 from hamcrest import assert_that, has_properties
 
 

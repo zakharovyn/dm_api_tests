@@ -1,5 +1,5 @@
-from apis.dm_api_account.models import *
-from apis.dm_api_account.models.registration_model import Registration
+from dm_api_account.models import *
+from dm_api_account.models.registration_model import Registration
 import allure
 
 
