@@ -2,6 +2,7 @@ from restclient.restclient import Restclient
 from utilites import validate_request_json, validate_status_code
 from requests import Response
 from ..models import *
+import allure
 
 
 class LoginApi:
@@ -24,12 +25,12 @@ class LoginApi:
         Authenticate via credentials
         :return:
         """
-
-        response = self.client.post(
-            path=f"/v1/account/login",
-            json=validate_request_json(json),
-            **kwargs
-        )
+        with allure.step(f'POST {self.host}/v1/account/login'):
+            response = self.client.post(
+                path=f"/v1/account/login",
+                json=validate_request_json(json),
+                **kwargs
+            )
         validate_status_code(response, status_code)
 
         if response.status_code == 200:
@@ -49,11 +50,11 @@ class LoginApi:
         Logout as current user
         :return:
         """
-
-        response = self.client.delete(
-            path=f"/v1/account/login",
-            **kwargs
-        )
+        with allure.step(f'DELETE {self.host}/v1/account/login'):
+            response = self.client.delete(
+                path=f"/v1/account/login",
+                **kwargs
+            )
         validate_status_code(response, status_code)
 
         return response
@@ -67,11 +68,11 @@ class LoginApi:
         Logout from every device
         :return:
         """
-
-        response = self.client.delete(
-            path=f"/v1/account/login/all",
-            **kwargs
-        )
+        with allure.step(f'DELETE {self.host}/v1/account/login/all'):
+            response = self.client.delete(
+                path=f"/v1/account/login/all",
+                **kwargs
+            )
         validate_status_code(response, status_code)
 
         return response

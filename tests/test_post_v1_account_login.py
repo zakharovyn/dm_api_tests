@@ -2,32 +2,16 @@ from dm_api_account.models.user_envelope_model import Rating, UserRole
 from hamcrest import assert_that, has_properties
 
 
-def test_post_v1_account_login(facade, orm, prepare_user):
+def test_post_v1_account_login(facade, orm, prepare_user, assertions):
     login = prepare_user.login
     email = prepare_user.email
     password = prepare_user.password
 
-    orm.delete_user_by_login(login=login)
-
-    dataset = orm.get_user_by_login(login=login)
-    assert len(dataset) == 0
-
-    facade.account.register_new_user(
-        login=login,
-        email=email,
-        password=password
-    )
-
-    dataset = orm.get_user_by_login(login=login)
-    for row in dataset:
-        assert row.Login == login
-        assert row.Activated is False
+    facade.account.register_new_user(login=login, email=email, password=password)
+    assertions.check_user_was_created(login=login)
 
     orm.update_activation_status(login=login, activation_status=True)
-
-    dataset = orm.get_user_by_login(login=login)
-    for row in dataset:
-        assert row.Activated is True
+    assertions.check_user_war_activated(login=login)
 
     response = facade.login.login_user(login=login, password=password, need_json=False)
 

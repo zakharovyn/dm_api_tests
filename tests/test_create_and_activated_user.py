@@ -5,7 +5,7 @@ import pytest
 @pytest.mark.parametrize('login, email, password, status_code, check', [
     ('Jack69', 'jack69@mail.ru', 'Jack69!Sparrow', 201, ''),
     (random_string(1, 12), random_string(1, 7) + '@mail.ru', random_string(1, 5), 400, {"Password": ["Short"]}),
-    (random_string(1, 1), random_string(1, 14) + '@mail.ru', random_string(1, 40), 400, {"Login": ["Short"]}),
+    (random_string(1, 1), random_string(1, 14) + '@mail.ru', random_string(), 400, {"Login": ["Short"]}),
     (random_string(), 'jack69@', random_string(1, 50), 400, {"Email": ["Invalid"]}),
     (random_string(1, 15), 'jack69makarevich', random_string(), 400, {"Email": ["Invalid"]})
 ])

@@ -1,3 +1,4 @@
+from generic.assertions.post_v1_account import AssertionsPostV1Account
 from generic.helpers.mailhog import MailhogApi
 from generic.helpers.dm_db import DmDatabase
 from generic.helpers.orm_db import OrmDatabase
@@ -7,6 +8,7 @@ from pathlib import Path
 from vyper import v
 import structlog
 import pytest
+import allure
 
 structlog.configure(
     processors=[
@@ -28,15 +30,26 @@ def facade(mailhog):
     )
 
 
+connect = None
+
+
 @pytest.fixture
 def db():
-    db = DmDatabase(
-        user=v.get('database.dm3_5.user'),
-        password=v.get('database.dm3_5.password'),
-        host=v.get('database.dm3_5.host'),
-        database=v.get('database.dm3_5.database')
-    )
-    return db
+    global connect
+    if connect is None:
+        connect = DmDatabase(
+            user=v.get('database.dm3_5.user'),
+            password=v.get('database.dm3_5.password'),
+            host=v.get('database.dm3_5.host'),
+            database=v.get('database.dm3_5.database')
+        )
+    return connect
+    # connect.db.db.close()
+
+
+@pytest.fixture
+def assertions(db):
+    return AssertionsPostV1Account(db)
 
 
 @pytest.fixture
@@ -51,6 +64,7 @@ def orm():
     orm.db.close_connection()
 
 
+@allure.step('Подготовка тестового пользователя')
 @pytest.fixture
 def prepare_user(mailhog, facade, db):
     user = namedtuple('User', 'login, email, password')
