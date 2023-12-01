@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dm_api_account.models.user_envelope_model import UserRole, Rating
+from apis.dm_api_account.models.user_envelope_model import UserRole, Rating
 from pydantic import BaseModel, Field, StrictStr, ConfigDict
 from typing import Any, List, Optional
 from datetime import datetime

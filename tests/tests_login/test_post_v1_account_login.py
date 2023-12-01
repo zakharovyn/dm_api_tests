@@ -1,8 +1,8 @@
-from dm_api_account.models.user_envelope_model import UserRole, Rating
+from apis.dm_api_account.models.user_envelope_model import Rating, UserRole
 from hamcrest import assert_that, has_properties
 
 
-def test_put_v1_account_token(facade, orm, prepare_user, assertions):
+def test_post_v1_account_login(facade, orm, prepare_user, assertions):
     login = prepare_user.login
     email = prepare_user.email
     password = prepare_user.password
@@ -10,8 +10,10 @@ def test_put_v1_account_token(facade, orm, prepare_user, assertions):
     facade.account.register_new_user(login=login, email=email, password=password)
     assertions.check_user_was_created(login=login)
 
-    response = facade.account.activate_registered_user(login=login)
+    orm.update_activation_status(login=login, activation_status=True)
     assertions.check_user_war_activated(login=login)
+
+    response = facade.login.login_user(login=login, password=password, need_json=False)
 
     assert_that(response.resource, has_properties({
         "login": login,
