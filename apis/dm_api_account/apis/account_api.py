@@ -1,7 +1,12 @@
+from apis.dm_api_account.models.user_details_envelope_model import UserDetailsEnvelope
+from apis.dm_api_account.models.change_password_model import ChangePassword
+from apis.dm_api_account.models.reset_password_model import ResetPassword
+from apis.dm_api_account.models.user_envelope_model import UserEnvelope
+from apis.dm_api_account.models.registration_model import Registration
+from apis.dm_api_account.models.change_email_model import ChangeEmail
 from utilites import validate_request_json, validate_status_code
-from restclient.restclient import Restclient
+from common_libs.restclient.restclient import Restclient
 from requests import Response
-from ..models import *
 import allure
 
 

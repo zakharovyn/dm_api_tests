@@ -1,4 +1,5 @@
 from generic.assertions.post_v1_account import AssertionsPostV1Account
+from data.post_v1_account import PostV1AccountData as user_data
 from generic.helpers.mailhog import MailhogApi
 from generic.helpers.dm_db import DmDatabase
 from generic.helpers.orm_db import OrmDatabase
@@ -68,8 +69,11 @@ def orm():
 @pytest.fixture
 def prepare_user(mailhog, facade, db):
     user = namedtuple('User', 'login, email, password')
-    User = user(login=f"new_user105", email=f"new_user105@email.com", password=f"new_user105")
-
+    User = user(
+        login=user_data.login,
+        email=user_data.email,
+        password=user_data.password
+    )
     db.delete_user_by_login(login=User.login)
     dataset = db.get_user_by_login(login=User.login)
     assert len(dataset) == 0

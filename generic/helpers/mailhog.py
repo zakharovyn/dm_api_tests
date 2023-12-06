@@ -1,7 +1,6 @@
-import allure
-
-from restclient.restclient import Restclient
+from common_libs.restclient.restclient import Restclient
 from requests import Response
+import allure
 import json
 import time
 
