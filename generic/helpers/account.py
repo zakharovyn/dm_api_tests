@@ -1,5 +1,4 @@
 from dm_api_account.models import *
-from dm_api_account.models.registration_model import Registration
 import allure
 
 
@@ -12,15 +11,14 @@ class Account:
     def set_headers(self, headers):
         self.facade.account_api.client.session.headers.update(headers)
 
-    def register_new_user(self, login: str, email: str, password: str, status_code: int = 201):
+    def register_new_user(self, login: str, email: str, password: str):
         with allure.step('Регистрация нового пользователя'):
-            response = self.facade.account_api.post_v1_account(
-                json=Registration(
+            response = self.facade.account_api.register(
+                registration=Registration(
                     login=login,
                     email=email,
                     password=password
-                ),
-                status_code=status_code
+                )
             )
 
         return response
@@ -34,7 +32,7 @@ class Account:
     def activate_registered_user(self, login: str, status_code: int = 200):
         with allure.step('Активация пользователя'):
             token = self.facade.mailhog.get_token_by_login(login=login)
-            response = self.facade.account_api.put_v1_account_token(status_code=status_code, token=token)
+            response = self.facade.account_api.activate(status_code=status_code, token=token)
 
         return response
 

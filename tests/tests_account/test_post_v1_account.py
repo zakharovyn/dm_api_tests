@@ -1,4 +1,5 @@
-from dm_api_account.models.user_envelope_model import UserRole, Rating
+from dm_api_account.model.rating import Rating
+from dm_api_account.model.user_role import UserRole
 from hamcrest import assert_that, has_properties
 import allure
 
@@ -19,11 +20,12 @@ class TestsPostV1Account:
         db.update_activation_status(login='new_user105', activation_status='true')
         assertions.check_user_war_activated(login=login)
 
-        response = facade.login.login_user(login=login, password=password, need_json=False)
+        response = facade.login.login_user(login=login, password=password)
 
+        print([UserRole.allowed_values[('value',)]['GUEST'], UserRole.allowed_values[('value',)]['PLAYER']])
         with allure.step('Проверка ответа при авторизации пользователя'):
             assert_that(response.resource, has_properties({
                 "login": login,
-                "roles": [UserRole.guest, UserRole.player],
+                "roles": [UserRole.allowed_values[('value',)]['GUEST'], UserRole.allowed_values[('value',)]['PLAYER']],
                 "rating": Rating(enabled=True, quality=0, quantity=0)
             }))
