@@ -1,15 +1,19 @@
 from generic.assertions.post_v1_account import AssertionsPostV1Account
 from data.post_v1_account import PostV1AccountData as user_data
+from apis.dm_grpc_account_async import AccountServiceStub
+from generic.helpers.grpc_account import GrpcAccount
 from generic.helpers.mailhog import MailhogApi
 from generic.helpers.dm_db import DmDatabase
 from generic.helpers.orm_db import OrmDatabase
 from services.dm_api_account import Facade
+from grpclib.client import Channel
 from collections import namedtuple
 from pathlib import Path
 from vyper import v
 import structlog
 import pytest
 import allure
+
 
 structlog.configure(
     processors=[
@@ -105,3 +109,18 @@ def pytest_addoption(parser):
     parser.addoption('--env', action='store', default='stg')
     for option in options:
         parser.addoption(f'--{option}', action='store', default=None)
+
+
+@pytest.fixture
+def grpc_account():
+    client = GrpcAccount(target='5.63.153.31:5055')
+    yield client
+    client.close()
+
+
+@pytest.fixture
+async def grpc_account_async():
+    channel = Channel(host='5.63.153.31', port=5055)
+    client = AccountServiceStub(channel)
+    return client
+
